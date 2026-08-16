@@ -2,10 +2,10 @@
   "name": "Census 2027 Occupation Assistant",
   "short_name": "Census Assistant",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#17202a",
-  "description": "Hindi-English decision assistant for Census occupation and industry classification.",
   "icons": [
     {
       "src": "icon.svg",
