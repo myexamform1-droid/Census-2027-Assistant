@@ -1,108 +1,89 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#17202a"><meta name="mobile-web-app-capable" content="yes">
-<title>Census 2027 Smart Occupation Assistant</title>
-<link rel="manifest" href="manifest.webmanifest">
+<title>Census 2027 Occupation Assistant</title><link rel="manifest" href="manifest.webmanifest">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#17202a;font-family:Arial,sans-serif}.wrap{max-width:980px;margin:auto;padding:12px}
-.card{background:#fff;border-radius:14px;padding:18px;margin:12px 0;box-shadow:0 2px 12px #0001}h1{font-size:24px;margin:0 0 6px}
-textarea{width:100%;min-height:135px;border:1px solid #c8d0d8;border-radius:10px;padding:13px;font-size:17px}
-button{border:0;border-radius:9px;padding:12px 16px;margin:6px 5px 0 0;font-size:15px;font-weight:700}.primary{background:#17202a;color:white}.secondary{background:#e8edf1}
-.answer{border-left:5px solid #17202a;background:#f8fafb;padding:12px;margin:9px 0;border-radius:7px}.label{font-weight:bold}.value{font-size:18px;margin-top:3px}
-.suggest{background:#fff8dc;border-left:5px solid #d39b00;padding:13px;border-radius:7px;margin-top:10px}.good{background:#edf8ef;border-left:5px solid #36814d;padding:13px;border-radius:7px}
-.pill{display:inline-block;background:#eef1f4;border-radius:20px;padding:7px 10px;margin:4px;font-size:14px}.small{font-size:13px;color:#68737e}
-@media(max-width:600px){.wrap{padding:8px}.card{padding:14px}h1{font-size:21px}button{width:100%;margin:5px 0}}
-</style><script>if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#17202a;font-family:Arial,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:16px}.card{background:#fff;border-radius:14px;padding:20px;margin:12px 0;box-shadow:0 3px 14px #0001}
+h1{font-size:25px;margin:0 0 8px}.muted{color:#5b6570}textarea{width:100%;min-height:150px;padding:14px;border:1px solid #cbd3da;border-radius:10px;font-size:17px}
+button{border:0;border-radius:9px;padding:13px 18px;margin:8px 5px 0 0;font-size:16px;font-weight:700;cursor:pointer}.primary{background:#17202a;color:white}.secondary{background:#e8edf1}
+.result{padding:13px;border-left:5px solid #17202a;background:#f8fafb;margin:10px 0;border-radius:6px}.label{font-weight:bold}.value{font-size:18px;margin-top:4px}
+.warn{background:#fff6d9;border-left:5px solid #d49a00;padding:12px;border-radius:6px}.ok{background:#eef8ef;border-left:5px solid #31804a;padding:12px;border-radius:6px}.small{font-size:13px;color:#68737e}
+@media(max-width:600px){.wrap{padding:10px}.card{padding:15px}h1{font-size:22px}button{width:100%;margin:5px 0}}
+</style><script>if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script>
 </head><body><div class="wrap">
-<div class="card">
-<h1>Census 2027 Smart Occupation Assistant</h1>
-<p>Describe the worker's situation in <b>Hindi, English, or mixed language</b>. You can give a long description.</p>
-<textarea id="input" placeholder="Example: राम अपने गांव में ट्रैक्टर चलाकर खेत जोतता है और कभी-कभी दूसरे किसानों के खेतों में पैसे लेकर काम करता है।&#10;&#10;Or: She works as a cashier in a private hospital pharmacy."></textarea>
-<button class="primary" id="go">Analyse situation</button><button class="secondary" id="clear">Clear</button>
-</div>
-<div class="card"><b>Quick examples</b><br>
-<button class="secondary ex">वह सरकारी स्कूल में कक्षा 8 के बच्चों को पढ़ाता है।</button>
-<button class="secondary ex">वह अपनी किराना दुकान चलाता है और सामान retail में बेचता है।</button>
-<button class="secondary ex">वह motorcycle repair workshop में mechanic है।</button>
-<button class="secondary ex">वह घरों में जाकर electrical wiring करता है।</button>
-<button class="secondary ex">वह private hospital में medicines बेचता और bills बनाता है।</button>
-</div>
-<div id="out" class="card" hidden>
-<h2>Suggested Census response</h2><div id="answers"></div><div id="follow"></div>
-</div>
-<div class="card"><div class="small"><b>Important:</b> This is a decision-support prototype. It does not invent official 2027 numeric codes. Verify final entries against the official Census 2027 Code Directory when available.</div></div>
+<div class="card"><h1>Census 2027 Occupation & Industry Assistant</h1>
+<p class="muted">Describe the person's actual work in <b>English, Hindi, or mixed Hindi-English</b>.</p>
+<textarea id="situation" placeholder="वह private school में teacher है।&#10;He repairs motorcycles in his own workshop."></textarea>
+<button class="primary" id="classifyBtn">Classify</button><button class="secondary" id="clearBtn">Clear</button></div>
+<div class="card"><b>Examples</b><br>
+<button class="secondary example">वह सरकारी स्कूल में शिक्षक है।</button>
+<button class="secondary example">वह अपनी किराना दुकान चलाता है।</button>
+<button class="secondary example">वह motorcycle repair की दुकान में mechanic है।</button>
+<button class="secondary example">वह private hospital में nurse है।</button>
+<button class="secondary example">He drives a taxi for a private owner.</button></div>
+<div id="output" class="card" hidden><h2>Suggested classification</h2><div id="lang" class="small"></div>
+<div class="result"><div class="label">Occupation</div><div id="occ" class="value"></div></div>
+<div class="result"><div class="label">Nature of industry, trade or service</div><div id="ind" class="value"></div></div>
+<div class="result"><div class="label">Broad occupational group</div><div id="group" class="value"></div></div>
+<div class="result"><div class="label">Reason</div><div id="why"></div></div><div id="questions"></div></div>
+<div class="card"><div class="warn"><b>Important:</b> This is a decision-support prototype, not an official 2027 numeric Census code lookup. Verify final entries against the official Code Directory when available.</div></div>
 </div>
 <script>
-const A=(id)=>document.getElementById(id);
-const R=[
-{keys:['teacher','शिक्षक','शिक्षिका','अध्यापक','अध्यापिका','पढ़ाता','पढ़ाती'],o:'Teacher / teaching professional',i:'Education / educational services',g:'Teaching professionals'},
-{keys:['doctor','डॉक्टर','चिकित्सक','surgeon','सर्जन'],o:'Doctor / physician',i:'Medical / health services',g:'Health professionals'},
-{keys:['nurse','नर्स','nursing'],o:'Nurse',i:'Hospital / health-care services',g:'Health professionals'},
-{keys:['pharmacist','फार्मासिस्ट','pharmacy','फार्मेसी','medical store','मेडिकल स्टोर'],o:'Pharmacist / pharmacy worker — exact duty may need confirmation',i:'Pharmaceutical / medical retail or hospital pharmacy activity',g:'Health/service workers'},
-{keys:['accountant','अकाउंटेंट','लेखाकार','chartered accountant'],o:'Accountant',i:'Accounting / professional services or employer activity',g:'Professionals'},
-{keys:['lawyer','advocate','वकील','अधिवक्ता'],o:'Lawyer / advocate',i:'Legal services',g:'Professionals'},
-{keys:['engineer','इंजीनियर','अभियंता'],o:'Engineer — specify branch/duty if possible',i:'Depends on employer/establishment activity',g:'Professionals'},
-{keys:['software','programmer','developer','सॉफ्टवेयर','प्रोग्रामर','डेवलपर'],o:'Software / IT professional',i:'Information technology / computer services',g:'Professionals'},
-{keys:['clerk','क्लर्क','office assistant','कार्यालय सहायक','data entry','डेटा एंट्री'],o:'Clerk / office worker',i:'Depends on employing establishment',g:'Clerks'},
-{keys:['cashier','कैशियर'],o:'Cashier',i:'Depends on the establishment where the cashier works',g:'Clerks/service workers'},
-{keys:['shopkeeper','दुकानदार','दुकान चलाता','दुकान चलाती','shop owner','दुकान मालिक'],o:'Shopkeeper / proprietor',i:'Retail or wholesale trade — identify principal goods and mode of sale',g:'Shop and market sales workers'},
-{keys:['kirana','किराना','grocery','परचून'],o:'Grocery shopkeeper / retail sales worker',i:'Retail trade — grocery/general provisions',g:'Shop and market sales workers'},
-{keys:['wholesale','थोक'],o:'Wholesale trader / sales worker',i:'Wholesale trade',g:'Shop and market sales workers'},
-{keys:['salesman','salesperson','सेल्समैन','बिक्री कर्मचारी'],o:'Sales worker',i:'Retail/wholesale trade or relevant service',g:'Shop and market sales workers'},
-{keys:['farmer','किसान','कृषक','खेती','crop','फसल'],o:'Cultivator / agricultural worker',i:'Crop agriculture',g:'Agricultural workers'},
-{keys:['agricultural labour','farm labour','कृषि मजदूर','खेत मजदूर'],o:'Agricultural labourer',i:'Agriculture',g:'Agricultural labourers'},
-{keys:['dairy','डेयरी','milk producer','दूध बेच'],o:'Dairy/livestock worker or farmer',i:'Animal production / dairy farming',g:'Agricultural workers'},
-{keys:['fisherman','fishing','मछुआरा','मछली पकड़'],o:'Fisher / fishery worker',i:'Fishing / aquaculture as applicable',g:'Fishery workers'},
-{keys:['driver','ड्राइवर','चालक'],o:'Driver — vehicle/service should be specified',i:'Transport services or employer's principal activity',g:'Drivers'},
-{keys:['tractor','ट्रैक्टर'],o:'Tractor driver/operator — confirm whether own farm work or hired service',i:'Agriculture if working own/farm cultivation; agricultural/contract service if hired for others',g:'Drivers/agricultural workers'},
-{keys:['delivery','डिलीवरी','courier','कूरियर'],o:'Delivery/courier worker',i:'Courier/delivery services',g:'Service workers'},
-{keys:['mechanic','मैकेनिक','मिस्त्री','repair','मरम्मत'],o:'Mechanic / repair worker — specify equipment if possible',i:'Repair and maintenance services',g:'Craft and related trades workers'},
-{keys:['carpenter','बढ़ई','furniture','फर्नीचर'],o:'Carpenter / furniture-making worker',i:'Furniture manufacturing/carpentry',g:'Craft and related trades workers'},
-{keys:['plumber','प्लंबर','नल मिस्त्री'],o:'Plumber',i:'Plumbing installation/repair services',g:'Craft and related trades workers'},
-{keys:['electrician','इलेक्ट्रीशियन','बिजली मिस्त्री','wiring','वायरिंग'],o:'Electrician / electrical installation worker',i:'Electrical installation/repair services',g:'Craft and related trades workers'},
-{keys:['mason','राजमिस्त्री','bricklayer','ईंट मिस्त्री'],o:'Mason / bricklayer',i:'Construction',g:'Craft and related trades workers'},
-{keys:['tailor','दर्जी','सिलाई','garment'],o:'Tailor / garment-making worker',i:'Garment manufacturing/tailoring services',g:'Craft and related trades workers'},
-{keys:['factory','फैक्ट्री','कारखाना','machine operator','मशीन ऑपरेटर'],o:'Production worker / machine operator — product should be specified',i:'Manufacturing — specify principal product',g:'Plant and machine operators'},
-{keys:['cook','chef','रसोइया','कुक','शेफ'],o:'Cook / chef',i:'Food service/restaurant activity where applicable',g:'Service workers'},
-{keys:['waiter','वेटर','restaurant','रेस्टोरेंट'],o:'Waiter / food-service worker',i:'Food service / restaurant activity',g:'Service workers'},
-{keys:['barber','नाई','hairdresser','बाल काट'],o:'Barber / hairdresser',i:'Personal grooming services',g:'Personal service workers'},
-{keys:['beautician','ब्यूटीशियन','beauty parlour','ब्यूटी पार्लर','salon','सैलून'],o:'Beautician / salon worker',i:'Beauty/personal grooming services',g:'Personal service workers'},
-{keys:['security guard','सिक्योरिटी गार्ड','watchman','चौकीदार'],o:'Security guard / protective service worker',i:'Security services or employer activity',g:'Protective service workers'},
-{keys:['police','पुलिस','पुलिसकर्मी'],o:'Police / protective service worker',i:'Public administration / police services',g:'Protective service workers'},
-{keys:['cleaner','sweeper','सफाई कर्मचारी','सफाईकर्मी'],o:'Cleaner / sweeper',i:'Depends on employer: household, hospital, municipality, etc.',g:'Elementary/service occupations'},
-{keys:['domestic worker','maid','housemaid','घरेलू कामगार','नौकरानी'],o:'Domestic worker',i:'Private household as employer',g:'Service workers'}
+'use strict';
+const rules=[
+{keys:['teacher','शिक्षक','शिक्षिका','अध्यापक','अध्यापिका','टीचर','पढ़ाता','पढ़ाती'],occ:'Teacher / teaching professional',ind:'Education / educational services',group:'Teaching professionals'},
+{keys:['doctor','physician','surgeon','डॉक्टर','चिकित्सक','सर्जन'],occ:'Doctor / physician',ind:'Health services / medical practice',group:'Health professionals'},
+{keys:['nurse','nursing','नर्स','नर्सिंग'],occ:'Nurse',ind:'Health services / hospital or medical care',group:'Health professionals'},
+{keys:['pharmacist','chemist','फार्मासिस्ट','मेडिकल स्टोर'],occ:'Pharmacist / pharmaceutical dispensing worker',ind:'Pharmaceutical / retail medical services',group:'Health/service workers'},
+{keys:['software developer','software engineer','programmer','web developer','सॉफ्टवेयर डेवलपर','सॉफ्टवेयर इंजीनियर','प्रोग्रामर'],occ:'Software / IT professional',ind:'Information technology / computer-related services',group:'Professionals'},
+{keys:['accountant','chartered accountant','अकाउंटेंट','लेखाकार','चार्टर्ड अकाउंटेंट'],occ:'Accountant / accounting professional',ind:'Accounting / professional services',group:'Professionals'},
+{keys:['lawyer','advocate','वकील','अधिवक्ता'],occ:'Lawyer / advocate',ind:'Legal services',group:'Professionals'},
+{keys:['cashier','कैशियर'],occ:'Cashier',ind:'Depends on the establishment; identify its principal activity',group:'Clerks/service workers'},
+{keys:['clerk','office assistant','data entry','क्लर्क','कार्यालय सहायक','डाटा एंट्री','डेटा एंट्री'],occ:'Clerk / office worker',ind:'Depends on employing establishment',group:'Clerks'},
+{keys:['grocery','kirana','supermarket','retail shop','shopkeeper','किराना','परचून','दुकानदार','दुकान'],occ:'Shopkeeper / retail sales worker',ind:'Retail trade',group:'Shop and market sales workers'},
+{keys:['salesman','salesperson','sales executive','सेल्समैन','बिक्री कर्मचारी','बिक्री'],occ:'Sales worker',ind:'Retail/wholesale trade or relevant service',group:'Shop and market sales workers'},
+{keys:['farmer','cultivator','cultivation','crop farming','किसान','कृषक','खेती','फसल उगाता','कृषि'],occ:'Cultivator / agricultural worker',ind:'Agriculture / crop production',group:'Agricultural workers'},
+{keys:['farm labour','agricultural labour','कृषि मजदूर','खेत मजदूर','खेती मजदूर'],occ:'Agricultural labourer',ind:'Agriculture',group:'Agricultural labourers'},
+{keys:['dairy farmer','milk producer','डेयरी किसान','पशुपालक'],occ:'Livestock/dairy worker or farmer',ind:'Animal production / dairy farming',group:'Agricultural workers'},
+{keys:['fisherman','fisher','fishing','मछुआरा','मछली पकड़ता','मत्स्य'],occ:'Fisher / fishery worker',ind:'Fishing / aquaculture as applicable',group:'Fishery workers'},
+{keys:['driver','taxi driver','truck driver','bus driver','auto driver','ड्राइवर','चालक','टैक्सी ड्राइवर','ट्रक ड्राइवर','बस चालक','ऑटो चालक'],occ:'Driver / mobile-plant operator',ind:'Transport services, unless part of another principal establishment activity',group:'Drivers'},
+{keys:['delivery boy','delivery agent','delivery executive','डिलीवरी बॉय','डिलीवरी एजेंट','डिलीवरी कर्मचारी'],occ:'Delivery / courier worker',ind:'Courier / delivery services',group:'Service workers'},
+{keys:['mechanic','motorcycle mechanic','car mechanic','auto mechanic','मिस्त्री','मैकेनिक','मोटरसाइकिल मिस्त्री','गाड़ी मिस्त्री'],occ:'Motor-vehicle mechanic / repair worker',ind:'Motor-vehicle repair and maintenance',group:'Craft and related trades workers'},
+{keys:['carpenter','woodworker','furniture maker','बढ़ई','बढ़ईगीरी','फर्नीचर कारीगर'],occ:'Carpenter / furniture-making worker',ind:'Furniture manufacturing / carpentry',group:'Craft and related trades workers'},
+{keys:['plumber','प्लंबर','नल मिस्त्री'],occ:'Plumber',ind:'Construction / plumbing installation and repair',group:'Craft and related trades workers'},
+{keys:['electrician','इलेक्ट्रीशियन','बिजली मिस्त्री'],occ:'Electrician',ind:'Electrical installation / construction services',group:'Craft and related trades workers'},
+{keys:['mason','bricklayer','राजमिस्त्री','ईंट मिस्त्री'],occ:'Mason / bricklayer',ind:'Construction',group:'Construction workers'},
+{keys:['factory worker','machine operator','फैक्टरी मजदूर','फैक्ट्री कर्मचारी','मशीन ऑपरेटर'],occ:'Production worker / machine operator',ind:'Manufacturing — specify product if known',group:'Plant and machine operators'},
+{keys:['tailor','sewing','garment maker','दर्जी','सिलाई','कपड़े सिलना'],occ:'Tailor / garment-making worker',ind:'Garment manufacturing / tailoring service',group:'Craft and related trades workers'},
+{keys:['cook','chef','रसोइया','कुक','शेफ'],occ:'Cook / chef',ind:'Food service / restaurant activity where applicable',group:'Service workers'},
+{keys:['waiter','restaurant worker','वेटर','होटल कर्मचारी','रेस्टोरेंट कर्मचारी'],occ:'Waiter / food-service worker',ind:'Food service / restaurant activity',group:'Service workers'},
+{keys:['barber','hairdresser','नाई','हेयर ड्रेसर','बाल काटता'],occ:'Barber / hairdresser',ind:'Personal grooming / salon services',group:'Personal service workers'},
+{keys:['beautician','beauty parlour','salon','ब्यूटीशियन','ब्यूटी पार्लर','सैलून'],occ:'Beautician / salon worker',ind:'Personal grooming / beauty services',group:'Personal service workers'},
+{keys:['security guard','watchman','सिक्योरिटी गार्ड','चौकीदार','सुरक्षा गार्ड'],occ:'Security guard / protective service worker',ind:'Security services or relevant employer activity',group:'Protective service workers'},
+{keys:['police','पुलिस','पुलिसकर्मी'],occ:'Police / protective service worker',ind:'Public administration / police services',group:'Protective service workers'},
+{keys:['bank employee','banker','बैंक कर्मचारी','बैंक में काम'],occ:'Need exact occupation (clerk, cashier, manager, etc.)',ind:'Banking / financial services',group:'Need exact occupation'},
+{keys:['government employee','सरकारी कर्मचारी','सरकारी नौकरी'],occ:'Need exact occupation (clerk, teacher, engineer, etc.)',ind:'Government/public administration as applicable',group:'Need exact occupation'},
+{keys:['domestic worker','maid','housemaid','घरेलू कामगार','नौकरानी','घर में काम'],occ:'Domestic worker / household service worker',ind:'Private household as employer',group:'Service workers'},
+{keys:['sweeper','cleaner','सफाई कर्मचारी','सफाईकर्मी','झाड़ू'],occ:'Cleaner / sweeper',ind:'Depends on employer',group:'Elementary/service occupations'},
+{keys:['contractor','ठेकेदार'],occ:'Contractor / manager — clarify principal work',ind:'Construction or other contracted activity depending on business',group:'Managers/employers'}
 ];
 
-function findRule(s){let hits=R.filter(r=>r.keys.some(k=>s.includes(k)));return hits.sort((a,b)=>b.keys.reduce((n,k)=>s.includes(k)?n+1: n,0)-a.keys.reduce((n,k)=>s.includes(k)?n+1:n,0))[0];}
-function has(s,a){return a.some(x=>s.includes(x));}
-function analyse(){
- const raw=A('input').value.trim(),s=raw.toLowerCase();A('out').hidden=false;
- if(!raw){render('<div class="suggest"><b>Start with the person's actual work.</b><br>Example: “वह private school में teacher है।”</div>');return;}
- const r=findRule(s); const q=[];
- // Occupation-specific details
- if(has(s,['driver','ड्राइवर','चालक'])&&!has(s,['taxi','टैक्सी','bus','बस','truck','ट्रक','auto','ऑटो','tractor','ट्रैक्टर','delivery','डिलीवरी']))q.push('🚗 <b>Vehicle:</b> किस वाहन को चलाता है? उदाहरण: taxi/टैक्सी, bus/बस, truck/ट्रक, auto/ऑटो, tractor/ट्रैक्टर, delivery vehicle.');
- if(has(s,['mechanic','मैकेनिक','मिस्त्री','repair','मरम्मत'])&&!has(s,['car','गाड़ी','motorcycle','मोटरसाइकिल','bike','बाइक','tractor','ट्रैक्टर','machine','मशीन','electrical','electrical']))q.push('🔧 <b>Repair किस चीज़ की?</b> उदाहरण: car, motorcycle, tractor, electrical appliance, industrial machine आदि.');
- if(has(s,['shop','दुकान','दुकानदार','shopkeeper','किराना','grocery','retail','wholesale','थोक'])&&!has(s,['grocery','किराना','medical','मेडिकल','cloth','कपड़ा','hardware','हार्डवेयर','furniture','फर्नीचर','mobile','मोबाइल','wholesale','थोक']))q.push('🏪 <b>दुकान में मुख्य वस्तु क्या है?</b> उदाहरण: किराना, कपड़ा, मेडिकल, हार्डवेयर, फर्नीचर, मोबाइल आदि। साथ में बताएं: retail/खुदरा या wholesale/थोक.');
- if(has(s,['factory','फैक्ट्री','कारखाना','machine operator','मशीन ऑपरेटर'])&&!has(s,['textile','कपड़ा','food','खाद्य','steel','स्टील','plastic','प्लास्टिक','furniture','फर्नीचर','cement','सीमेंट','garment','वस्त्र']))q.push('🏭 <b>फैक्ट्री में मुख्य उत्पाद क्या बनता है?</b> उदाहरण: कपड़ा, खाद्य पदार्थ, स्टील, प्लास्टिक, फर्नीचर, सीमेंट आदि.');
- if(has(s,['teacher','शिक्षक','अध्यापक'])&&!has(s,['school','स्कूल','विद्यालय','college','कॉलेज','university','विश्वविद्यालय','coaching','कोचिंग']))q.push('🎓 <b>कहाँ पढ़ाता है?</b> उदाहरण: सरकारी स्कूल, private school, college, university, coaching centre.');
- if(has(s,['nurse','नर्स','doctor','डॉक्टर'])&&!has(s,['hospital','अस्पताल','clinic','क्लिनिक','nursing home','नर्सिंग होम']))q.push('🏥 <b>कार्यस्थल क्या है?</b> उदाहरण: government hospital, private hospital, clinic, nursing home आदि.');
- if(has(s,['bank','बैंक'])&&!has(s,['clerk','क्लर्क','cashier','कैशियर','manager','मैनेजर','officer','अधिकारी','guard','गार्ड']))q.push('🏦 <b>बैंक में वास्तविक पद/काम क्या है?</b> उदाहरण: clerk, cashier, manager, officer, security guard आदि.');
- if(has(s,['government employee','सरकारी कर्मचारी','सरकारी नौकरी','सरकारी विभाग'])&&!has(s,['teacher','शिक्षक','clerk','क्लर्क','police','पुलिस','engineer','इंजीनियर','doctor','डॉक्टर','nurse','नर्स']))q.push('🏛️ <b>सरकारी नौकरी में वास्तविक काम क्या करता है?</b> उदाहरण: clerk, teacher, engineer, police, driver, accountant आदि.');
- // Work arrangement
- if(has(s,['own','अपनी','स्वयं','self employed','स्वरोजगार','business','व्यवसाय','दुकान'])&&!has(s,['employee','कर्मचारी','salary','वेतन','नौकरी','job']))q.push('👤 <b>काम की स्थिति:</b> क्या यह व्यक्ति खुद का काम/दुकान चलाता है, या किसी के यहाँ कर्मचारी है?');
- // Establishment principal activity
- if(r && !has(s,['school','स्कूल','hospital','अस्पताल','shop','दुकान','factory','फैक्ट्री','workshop','वर्कशॉप','farm','खेत','office','कार्यालय','bank','बैंक','restaurant','रेस्टोरेंट','salon','सैलून','household','घर']))q.push('🏢 <b>काम कहाँ/किस संस्था में होता है?</b> उदाहरण: school, hospital, shop, factory, workshop, farm, office आदि.');
- if(!r){render('<div class="suggest"><b>मैं अभी सुरक्षित classification नहीं दे सकता।</b><br><br>कृपया एक ही वाक्य में यह लिखें:<ol><li>व्यक्ति क्या काम करता है?</li><li>कहाँ/किस प्रकार के establishment में करता है?</li><li>अगर अपना काम है तो मुख्य वस्तु/सेवा क्या है?</li></ol><b>उदाहरण:</b> “वह अपनी दुकान में मोबाइल फोन और accessories retail में बेचता है।”</div>');return;}
- let html='<div class="answer"><div class="label">Occupation / व्यवसाय</div><div class="value">'+r.o+'</div></div>';
- html+='<div class="answer"><div class="label">Nature of industry, trade or service / उद्योग, व्यापार या सेवा की प्रकृति</div><div class="value">'+r.i+'</div></div>';
- html+='<div class="answer"><div class="label">Broad occupational group</div><div class="value">'+r.g+'</div></div>';
- html+='<div class="good"><b>Why:</b> Occupation is based on what the person actually does. Industry/trade/service is based on the principal activity of the establishment.</div>';
- if(q.length){html+='<div class="suggest"><b>More information needed — answer these in your next message:</b><ol>'+q.map(x=>'<li>'+x+'</li>').join('')+'</ol><b>Easy reply format:</b><br>“[काम], [कहाँ काम करता है], [अपना/कर्मचारी], [मुख्य वस्तु/सेवा]”</div>';}
- else html+='<div class="good"><b>Looks sufficiently specific for a preliminary answer.</b> You can still add exact product/service and employment status for a more precise entry.</div>';
- render(html);
+function show(o,i,g,w,q){document.getElementById('occ').textContent=o;document.getElementById('ind').textContent=i;document.getElementById('group').textContent=g;document.getElementById('why').textContent=w;document.getElementById('questions').innerHTML=q;}
+function classify(){
+ const raw=document.getElementById('situation').value.trim(), s=raw.toLowerCase(), out=document.getElementById('output');out.hidden=false;
+ document.getElementById('lang').textContent=/[\u0900-\u097F]/.test(raw)?'Input detected: Hindi / mixed Hindi-English':'Input detected: English / mixed language';
+ if(!raw){show('Need information','Need information','Not determined','No situation was entered.','<div class="warn">Describe the actual work, e.g. <b>वह private school में teacher है।</b></div>');return;}
+ const m=rules.filter(r=>r.keys.some(k=>s.includes(k))), q=[];
+ if(/(bank employee|बैंक कर्मचारी|government employee|सरकारी कर्मचारी)/i.test(raw)&&!/(clerk|क्लर्क|cashier|कैशियर|manager|मैनेजर|teacher|शिक्षक|engineer|इंजीनियर|officer|अधिकारी)/i.test(raw))q.push('What is the person’s actual occupation/duty?');
+ if(/(teacher|शिक्षक|अध्यापक|doctor|डॉक्टर|nurse|नर्स)/i.test(raw)&&!/(school|विद्यालय|स्कूल|college|कॉलेज|hospital|अस्पताल|clinic|क्लिनिक)/i.test(raw))q.push('What type of establishment is the workplace?');
+ if(/(driver|ड्राइवर|चालक)/i.test(raw)&&!/(taxi|टैक्सी|bus|बस|truck|ट्रक|auto|ऑटो|delivery|डिलीवरी)/i.test(raw))q.push('What vehicle/service does the person drive?');
+ if(/(shop|दुकान|दुकानदार|shopkeeper|kirana|किराना)/i.test(raw)&&!/(retail|खुदरा|wholesale|थोक|grocery|किराना|medical|मेडिकल|hardware|हार्डवेयर|cloth|कपड़ा|furniture|फर्नीचर)/i.test(raw))q.push('What does the shop mainly sell, and is it retail or wholesale?');
+ if(!m.length){show('Need more information','Need more information','Not determined','Not enough information for a safe preliminary classification.','<div class="warn"><b>Add:</b> exact daily work + what the establishment mainly produces, sells or provides.</div>');return;}
+ const r=m[0], extra=q.length?'<div class="warn"><b>Clarify before final entry:</b><ul>'+q.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>':'<div class="ok"><b>Preliminary result:</b> Verify actual duties and principal establishment activity before final Census entry.</div>';
+ show(r.occ,r.ind,r.group,'Occupation is what the person actually does; industry/trade/service is the principal activity of the establishment.',extra);
 }
-function render(x){A('answers').innerHTML=x;A('follow').innerHTML='';}
-A('go').onclick=analyse;A('clear').onclick=()=>{A('input').value='';A('out').hidden=true;};
-document.querySelectorAll('.ex').forEach(b=>b.onclick=()=>{A('input').value=b.textContent;analyse();});
+document.getElementById('classifyBtn').addEventListener('click',classify);
+document.getElementById('clearBtn').addEventListener('click',()=>{document.getElementById('situation').value='';document.getElementById('output').hidden=true;});
+document.querySelectorAll('.example').forEach(b=>b.addEventListener('click',()=>{document.getElementById('situation').value=b.textContent;classify();}));
 </script></body></html>

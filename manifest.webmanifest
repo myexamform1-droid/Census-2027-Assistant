@@ -1,10 +1,10 @@
 {
-  "name": "Census 2027 Smart Occupation Assistant",
+  "name": "Census 2027 Occupation Assistant",
   "short_name": "Census Assistant",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f3f6f8",
+  "background_color": "#f4f6f8",
   "theme_color": "#17202a",
   "icons": [
     {
